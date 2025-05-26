@@ -9,7 +9,6 @@ public class ScripMain : MonoBehaviour
     public GameObject MeshSize;
     public InputField InputMeshSizeLine;
     public InputField InputMeshSizeGrow;
-    public InputField InputStatus;
     public int MsizeLine;
     public int MsizeGrow;
     public GameObject LineMesh;
@@ -29,6 +28,9 @@ public class ScripMain : MonoBehaviour
     public Text pathLength;
     public Text pathDetail;
     public GameObject Notification;
+    public InputField[] InputStatust;
+    public int posX, posY;
+    public int count;
     class Node
     {
         public int X { get; set; }
@@ -126,58 +128,87 @@ public class ScripMain : MonoBehaviour
             EndY.text = "";
             PosStartEnd.SetActive(false);
             LineMesh.SetActive(true);
+            count = 0;
+            if (MsizeGrow % 2 == 0)
+            {
+                posX = -(MsizeGrow / 2 - 1) * 90 - 45;
+            }
+            else
+            {
+                posX = -(MsizeGrow / 2) * 90;
+            }
+            if (MsizeLine % 2 == 0)
+            {
+                posY = (MsizeLine / 2 - 1) * 90 + 10;
+            }
+            else
+            {
+                posY = (MsizeLine / 2) * 90 - 35;
+            }
+            for (int i = 0; i < MsizeGrow; i++)
+            {
+                for (int j = 0; j < MsizeLine; j++)
+                {
+                    RectTransform rec = InputStatust[count].GetComponent<RectTransform>();
+                    rec.anchoredPosition = new Vector2(posX, posY);
+                    posY -= 90;
+                    count++;
+                }
+                posY = posY + 90 * (MsizeLine);
+                posX += 90;
+            }
+            for(int i = count; i < 49; i++)
+            {
+                InputStatust[i].gameObject.SetActive(false);
+            }
+            
         }
     }
     public void ClickAfterStatus()
     {
-        if (InputStatus.text != "0" && InputStatus.text != "1")
+        count = 0;
+        for (int i = 0; i < MsizeGrow; i++)
         {
-            Notification.SetActive(true);
+            for (int j = 0; j < MsizeLine; j++)
+            {
+                if (InputStatust[count].text != "0" && InputStatust[count].text != "1")
+                {
+                    Notification.SetActive(true);
+                }
+                Mesh[i, j] = int.Parse(InputStatust[count].text);
+                InputStatust[count].text = "";
+                count++;
+            }
+        }
+        for (int i = count; i < 49; i++)
+        {
+            InputStatust[i].gameObject.SetActive(true);
+        }
+        String res = "";
+        var (distance, path) = FindShortestPath(Mesh, start, end);
+        Debug.Log(distance + " " + path);
+        if (distance > 0)
+        {
+
+            pathLength.text = distance.ToString();
+            foreach (var point in path)
+            {
+                if (point.Item1 == end.x && point.Item2 == end.y)
+                {
+                    res += $"({point.Item1}, {point.Item2})";
+                }
+                else
+                    res += $"({point.Item1}, {point.Item2})->";
+            }
+            pathDetail.text = res;
         }
         else
         {
-            if (Msize > 0)
-            {
-                Mesh[x, y] = int.Parse(InputStatus.text);
-                Debug.Log(Mesh[x, y]);
-                y++;
-                if (y >= MsizeGrow)
-                {
-                    x++;
-                    y = 0;
-                }
-                InputStatus.text = "";
-                Msize--;
-            }
-            if (Msize == 0)
-            {
-                String res = "";
-                var (distance, path) = FindShortestPath(Mesh, start, end);
-                Debug.Log(distance + " " + path);
-                if (distance > 0)
-                {
-
-                    pathLength.text = distance.ToString();
-                    foreach (var point in path)
-                    {
-                        if (point.Item1 == end.x && point.Item2 == end.y)
-                        {
-                            res += $"({point.Item1}, {point.Item2})";
-                        }
-                        else
-                            res += $"({point.Item1}, {point.Item2})->";
-                    }
-                    pathDetail.text = res;
-                }
-                else
-                {
-                    pathLength.text = "NULL";
-                    pathDetail.text = "NULL";
-                }
-                LineMesh.SetActive(false);
-                result.SetActive(true);
-            }
+            pathLength.text = "NULL";
+            pathDetail.text = "NULL";
         }
+        LineMesh.SetActive(false);
+        result.SetActive(true);
     }
     public void ClickNew()
     {
