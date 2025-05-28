@@ -175,7 +175,7 @@ public class ScripMain : MonoBehaviour
                 {
                     Notification.SetActive(true);
                 }
-                Mesh[i, j] = int.Parse(InputStatust[count].text);
+                Mesh[j,i] = int.Parse(InputStatust[count].text);
                 InputStatust[count].text = "";
                 count++;
             }
