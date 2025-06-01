@@ -164,7 +164,7 @@ public class ScripMain : MonoBehaviour
             
         }
     }
-    public void ClickAfterStatus()
+    public void ClickSummit()
     {
         count = 0;
         for (int i = 0; i < MsizeGrow; i++)
@@ -176,13 +176,8 @@ public class ScripMain : MonoBehaviour
                     Notification.SetActive(true);
                 }
                 Mesh[j,i] = int.Parse(InputStatust[count].text);
-                InputStatust[count].text = "";
                 count++;
             }
-        }
-        for (int i = count; i < 49; i++)
-        {
-            InputStatust[i].gameObject.SetActive(true);
         }
         String res = "";
         var (distance, path) = FindShortestPath(Mesh, start, end);
@@ -193,12 +188,18 @@ public class ScripMain : MonoBehaviour
             pathLength.text = distance.ToString();
             foreach (var point in path)
             {
+                int k = point.Item1+point.Item2*MsizeGrow;
+                Debug.Log(k);
+                Image background = InputStatust[k].image;
+                background.color = Color.red;
                 if (point.Item1 == end.x && point.Item2 == end.y)
                 {
                     res += $"({point.Item1}, {point.Item2})";
                 }
                 else
+                {
                     res += $"({point.Item1}, {point.Item2})->";
+                }
             }
             pathDetail.text = res;
         }
@@ -206,6 +207,24 @@ public class ScripMain : MonoBehaviour
         {
             pathLength.text = "NULL";
             pathDetail.text = "NULL";
+        }
+    }
+    public void Clickresult()
+    {
+        count = 0;
+        for (int i = 0; i < MsizeGrow; i++)
+        {
+            for (int j = 0; j < MsizeLine; j++)
+            {
+                InputStatust[count].text = "";
+                Image background = InputStatust[count].image;
+                background.color = Color.white;
+                count++;
+            }
+        }
+        for (int i = count; i < 49; i++)
+        {
+            InputStatust[i].gameObject.SetActive(true);
         }
         LineMesh.SetActive(false);
         result.SetActive(true);
